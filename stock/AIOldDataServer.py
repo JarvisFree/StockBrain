@@ -21,6 +21,7 @@ from stock.GetStockDataServer import GetStockDataServer
 class AIOldDataServer:
     get_stock_data = GetStockDataServer()
 
+    @staticmethod
     def ai_trading_day(self):
         """
         功能1：判断自然日是否是交易日（YES：返回此自然日；NO：从此自然日依次往前推至交易日 并返回）
@@ -111,9 +112,9 @@ if __name__ == "__main__":
 
     # ai_old_data.ai_trading_day("20191007")
 
-    # ai_old_data.ai_trading_day("20191008")
+    AIOldDataServer.ai_trading_day("20210710")
 
-    ai_old_data.ai_get_close_data_by_id_and_date_write_csv()
+    # ai_old_data.ai_get_close_data_by_id_and_date_write_csv()
 
     time_end = datetime.datetime.now()
     print("运行此程序共耗时：{}".format(time_end - time_start))

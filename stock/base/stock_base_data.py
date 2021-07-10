@@ -121,4 +121,4 @@ def get_a_all_stock():
 
 if __name__ == '__main__':
     # get_hang_ye()
-    get_a_all_stock()
+    print(get_a_all_stock())

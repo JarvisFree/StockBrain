@@ -82,7 +82,7 @@ class GetStockDataServer:
         print(result)
         # 没有数据
         if len(result) == 0:
-            print("[ERROR][get3_stock_close_price_by_id_and_date] 第 {} 支股票 {}，在{}的收盘价为：{}".format(self.stock_count_get3,
+            print("[WARNING][get3_stock_close_price_by_id_and_date] 第 {} 支股票 {}，在{}的收盘价为：{}".format(self.stock_count_get3,
                                                                                                   stock_id,
                                                                                                   date, result))
         # 有数据
@@ -179,7 +179,7 @@ class GetStockDataServer:
             dict_all = {
                 "symbol": stock_id_list[count_by_stock],
                 "name": stock_name_list[count_by_stock],
-                "date": dict_date
+                "data": dict_date
             }
             close_price.append(dict_all)
             count_by_stock = count_by_stock + 1
@@ -259,26 +259,17 @@ class GetStockDataByDongFang:
 
 
 # 新浪数据
-# if __name__ == "__main__":
-#     times1 = datetime.datetime.now()
-#     get_stock_data = GetStockData
-#
-#     # get_stock_data.get_stock_all_data_by_id("sz002415")
-#
-#     # get_stock_data.get_stock_all_data_by_id_and_date("sz002415", "20191023")
-#
-#     # get_stock_data.get_stock_close_price_by_id_and_date("sz002415", "20191022")
-#
-#     get_stock_data.get4_all_stock_id_by_type("sz_a")
-#
-#     # get_stock_data.get5_all_stock_id_by_concept_in_block("")
-#
-#     times2 = datetime.datetime.now()
-#     times = times2 - times1
-#     print("运行此程序总耗时：{}".format(times))
+if __name__ == "__main__":
+    times1 = datetime.datetime.now()
+    get_stock_data = GetStockDataServer()
 
+    get_stock_data.get6_close_by_id_and_date(['sh600010'], ['包钢股份'], ['20210706', '20210707', '20210708', '20210709'])
+
+    times2 = datetime.datetime.now()
+    times = times2 - times1
+    print("运行此程序总耗时：{}".format(times))
 
 # 东方财富数据
-if __name__ == '__main__':
-    # GetStockDataByDongFang().get_all_a_stock()
-    GetStockDataByDongFang().get_lhb()
+# if __name__ == '__main__':
+#     # GetStockDataByDongFang().get_all_a_stock()
+#     GetStockDataByDongFang().get_lhb()

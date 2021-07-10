@@ -20,6 +20,16 @@ def jx_jquery_result(str1):
     :param str1:
     :return: 字典
     """
-    tupe_str = eval(str1[str1.find('('):-1] + ',')
-    # print(tupe_str[0])
+    if str1.endswith(';'):
+        tupe_str = eval(str1[str1.find('('):-1] + ',')  # 去掉括号前后的东西 并转换为元组
+    elif str1.endswith(')'):
+        tupe_str = eval(str1[str1.find('('):] + ',')  # 去掉括号前后的东西 并转换为元组
+    else:
+        print('没有预定的结尾符')
     return tupe_str[0]
+
+
+if __name__ == '__main__':
+    aa = jx_jquery_result(
+        '/**/jQuery19103950574251888599_1620545412321({"result_message":"验证码校验成功","result_code":"4"});')
+    print(aa)
