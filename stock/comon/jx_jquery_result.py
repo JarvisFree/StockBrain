@@ -20,6 +20,10 @@ def jx_jquery_result(str1):
     :param str1:
     :return: 字典
     """
+
+    if str1.find('null') != -1:
+        str1 = str1.replace('null', '"null"')
+
     if str1.endswith(';'):
         tupe_str = eval(str1[str1.find('('):-1] + ',')  # 去掉括号前后的东西 并转换为元组
     elif str1.endswith(')'):

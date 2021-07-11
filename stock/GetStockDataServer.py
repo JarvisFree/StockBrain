@@ -42,11 +42,12 @@ class GetStockDataServer:
         return result_list
 
     @staticmethod
-    def get2_stock_all_data_by_id_and_date(stock_id, date):
+    def get2_stock_all_data_by_id_and_date(stock_id, date, is_print=False):
         """
         功能2：获取指定股票指定交易日的所有信息
         :param stock_id: 股票代码
         :param date: 指定日期（格式：yyyymmdd）
+        :param is_print:
         :return: 返回此股票指定交易日的所有数据（开盘价、收盘价、最高价、最低价、涨跌额、涨跌幅、换手率(待定)、成交量、成交金额、总市值、流通市值(待定)）
         """
         # 判断传入的代码是否是字母加数字（如 sz002415）
@@ -63,7 +64,8 @@ class GetStockDataServer:
         result = requests.get(url)
         # print(result.url)
         result = result.text.split("\r\n")[1].split(",")[3:]
-        print("[get2_stock_all_data_by_id_and_date] {}股票在 {} 的所有数据为：{}".format(stock_id[1:], date, result))
+        if is_print:
+            print("[get2_stock_all_data_by_id_and_date] {}股票在 {} 的所有数据为：{}".format(stock_id[1:], date, result))
         return result
 
     def get3_stock_close_price_by_id_and_date(self, stock_id, date):
@@ -82,7 +84,8 @@ class GetStockDataServer:
         print(result)
         # 没有数据
         if len(result) == 0:
-            print("[WARNING][get3_stock_close_price_by_id_and_date] 第 {} 支股票 {}，在{}的收盘价为：{}".format(self.stock_count_get3,
+            print(
+                "[WARNING][get3_stock_close_price_by_id_and_date] 第 {} 支股票 {}，在{}的收盘价为：{}".format(self.stock_count_get3,
                                                                                                   stock_id,
                                                                                                   date, result))
         # 有数据
@@ -209,13 +212,13 @@ class GetStockDataByDongFang:
                              'invt=2&' \
                              'fid=f3&' \
                              'fs=m:0+t:6,m:0+t:13,m:0+t:80,m:1+t:2,m:1+t:23&' \
-                             'fields=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23,f24,f25,f22,f11,f62,f128,f136,f115,f152&' \
+                             'fields=f44,f51,f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23,f24,f25,f22,f11,f62,f128,f136,f115,f152&' \
                              '_=1611118385503'  # 13位时间戳
         result = requests.get(url=url).text
         result = result[len(quer) + 1:-2]  # 转换接口返回数据的格式（转为json字符串）
         result = json.loads(result)
         count = result['data']['total']
-        print(json.dumps(result))
+        print(json.dumps(result, ensure_ascii=False))
         print('沪深A股所有股票数：', count)
 
     def get_lhb(self):
@@ -259,17 +262,17 @@ class GetStockDataByDongFang:
 
 
 # 新浪数据
-if __name__ == "__main__":
-    times1 = datetime.datetime.now()
-    get_stock_data = GetStockDataServer()
-
-    get_stock_data.get6_close_by_id_and_date(['sh600010'], ['包钢股份'], ['20210706', '20210707', '20210708', '20210709'])
-
-    times2 = datetime.datetime.now()
-    times = times2 - times1
-    print("运行此程序总耗时：{}".format(times))
+# if __name__ == "__main__":
+#     times1 = datetime.datetime.now()
+#     get_stock_data = GetStockDataServer()
+#
+#     get_stock_data.get6_close_by_id_and_date(['sh600010'], ['包钢股份'], ['20210706', '20210707', '20210708', '20210709'])
+#
+#     times2 = datetime.datetime.now()
+#     times = times2 - times1
+#     print("运行此程序总耗时：{}".format(times))
 
 # 东方财富数据
-# if __name__ == '__main__':
-#     # GetStockDataByDongFang().get_all_a_stock()
-#     GetStockDataByDongFang().get_lhb()
+if __name__ == '__main__':
+    GetStockDataByDongFang().get_all_a_stock()
+    # GetStockDataByDongFang().get_lhb()
