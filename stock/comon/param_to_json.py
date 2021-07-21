@@ -31,7 +31,7 @@ def params_to_json(str_params):
     result_dict = {}
     for item in result_list:
         # 是否有”=“符号
-        if item.find('=') != -1:
+        if item.__find('=') != -1:
             item_result = item.split('=')
             result_dict.update({item_result[0]: item_result[1]})
         else:

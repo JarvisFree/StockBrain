@@ -18,6 +18,7 @@
 import datetime
 
 from stock.base.get_data_server import GetMicData
+from stock.comon.calc_tool import find_desc, find_asc
 from stock.comon.decorator import elapsed_time
 from stock.comon.stock_tool import is_trading
 
@@ -63,61 +64,19 @@ def get_1(day_count: int, stock_id='sh600010'):
 
 
 @elapsed_time('获取包钢股份历史中连续N个交易日持续下跌')
-def get_11(day_count: int, stock_id='sh600010'):
+def get_11(day_count: int, min_limit, stock_id):
+    """
+    获取指定个股历史中连续N及以上个交易日持续下跌的数据
+    @param day_count: 历史天数（365：最近365个自然日）
+    @param min_limit: 连续N天
+    @param stock_id: 股票ID（sh600010）
+    @return:
+    """
     result = get_1(day_count, stock_id)
-    all_model = []
-    count = 1
-    while True:
-        if len(result) >= 5:
-            print(f'第{count}次循环，result长度={len(result)}')
-            count += 1
-            if result[0]['F4_CLOSE'] < result[1]['F4_CLOSE'] < \
-                    result[2]['F4_CLOSE'] < result[3]['F4_CLOSE'] < result[4]['F4_CLOSE']:
-                all_model.append(
-                    (
-                        result[0],
-                        result[1],
-                        result[2],
-                        result[3],
-                        result[4],
-                    )
-                )
-                result.pop(0)
-            else:
-                result.pop(0)
-        else:
-            break
-    print(f'共有{len(all_model)}次连续5个交易日持续下跌')
-    return all_model
+    re_data = find_asc(result, min_limit, keyword='F4_CLOSE')
+    print(f'共有{len(re_data)}次连续{min_limit}个及以上交易日持续下跌')
+    return re_data
 
 
 if __name__ == '__main__':
-    print(*get_11(365 * 2, 'sh600010'), sep='\n')
-    # ss = (
-    #     {'F0_DATE': '2021-03-24', 'F1_STOCK_ID': "'600010", 'F2_STOCK_NAME': '包钢股份', 'F3_OPEN': '1.58',
-    #      'F4_CLOSE': '1.54',
-    #      'F5_HIGH': '1.6', 'F6_LOW': '1.53', 'F7_CHG': '-0.06', 'F8_P_CHG': '-3.75', 'F9_TURNOVER': '3.3741',
-    #      'F10_VO_TURNOVER': '1068813665', 'F11_VA_TURNOVER': '1666476636.0', 'F12_T_CAP': '70200950277.9',
-    #      'F13_M_CAP': '48782905844.0'},
-    #     {'F0_DATE': '2021-03-23', 'F1_STOCK_ID': "'600010", 'F2_STOCK_NAME': '包钢股份', 'F3_OPEN': '1.67',
-    #      'F4_CLOSE': '1.6',
-    #      'F5_HIGH': '1.68', 'F6_LOW': '1.59', 'F7_CHG': '-0.08', 'F8_P_CHG': '-4.7619', 'F9_TURNOVER': '3.9376',
-    #      'F10_VO_TURNOVER': '1247333896', 'F11_VA_TURNOVER': '2023953229.0', 'F12_T_CAP': '72936052236.8',
-    #      'F13_M_CAP': '50683538539.2'},
-    #     {'F0_DATE': '2021-03-22', 'F1_STOCK_ID': "'600010", 'F2_STOCK_NAME': '包钢股份', 'F3_OPEN': '1.71',
-    #      'F4_CLOSE': '1.68',
-    #      'F5_HIGH': '1.74', 'F6_LOW': '1.65', 'F7_CHG': '-0.03', 'F8_P_CHG': '-1.7544', 'F9_TURNOVER': '3.8398',
-    #      'F10_VO_TURNOVER': '1216347331', 'F11_VA_TURNOVER': '2055509637.0', 'F12_T_CAP': '76582854848.6',
-    #      'F13_M_CAP': '53217715466.2'},
-    #     {'F0_DATE': '2021-03-19', 'F1_STOCK_ID': "'600010", 'F2_STOCK_NAME': '包钢股份', 'F3_OPEN': '1.72',
-    #      'F4_CLOSE': '1.71',
-    #      'F5_HIGH': '1.76', 'F6_LOW': '1.68', 'F7_CHG': '-0.05', 'F8_P_CHG': '-2.8409', 'F9_TURNOVER': '3.6293',
-    #      'F10_VO_TURNOVER': '1149673900', 'F11_VA_TURNOVER': '1974537177.0', 'F12_T_CAP': '77950405828.1',
-    #      'F13_M_CAP': '54168031813.8'},
-    #     {'F0_DATE': '2021-03-18', 'F1_STOCK_ID': "'600010", 'F2_STOCK_NAME': '包钢股份', 'F3_OPEN': '1.8',
-    #      'F4_CLOSE': '1.76',
-    #      'F5_HIGH': '1.81', 'F6_LOW': '1.75', 'F7_CHG': '-0.04', 'F8_P_CHG': '-2.2222', 'F9_TURNOVER': '3.63',
-    #      'F10_VO_TURNOVER': '1149883261', 'F11_VA_TURNOVER': '2036145249.0', 'F12_T_CAP': '80229657460.5',
-    #      'F13_M_CAP': '55751892393.1'})
-    # print(*ss, sep='\n')
-
+    print(*get_11(365 * 2, 5, 'sh600010'), sep='\n')

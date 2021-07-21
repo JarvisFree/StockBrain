@@ -122,7 +122,7 @@ def get_all_report(stock_id='600010'):
         n_data = []
         is_have = False
         for i in data:
-            if i["title"].find('摘要') == -1:  # 1 删除含“摘要”的
+            if i["title"].__find('摘要') == -1:  # 1 删除含“摘要”的
                 res = re.search('\D\d{4}\D', i["title"])
                 if res is not None:
                     if res.group()[1:-1] == str(now_year):
