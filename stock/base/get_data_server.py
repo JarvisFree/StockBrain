@@ -10,9 +10,9 @@
 """
 import json
 import time
+from enum import Enum
 
 import requests
-
 from stock.comon.decorator import elapsed_time
 from stock.comon.jx_jquery_result import jx_jquery_result
 
@@ -34,13 +34,36 @@ class DataSet:
     F13_M_CAP = 'F13_M_CAP'  # 流通市值
 
 
+class EnumPlateType(Enum):
+    """
+    板块类型
+    """
+    gai_lian = '概念板块'
+    di_yu = '地域板块'
+    hang_ye = '行业板块'
+
+
+class EnumPointerType(Enum):
+    """
+    指标类型
+    """
+    RSI = 'RSI'
+    KDJ = 'KDJ'
+    MACD = 'MACD'
+    DMI = 'DMI'
+    BIAS = 'BIAS'
+    OBV = 'OBV'
+    CCI = 'CCI'
+    ROC = 'ROC'
+
+
 class GetMicData:
     """
     微观数据获取
     """
 
     @staticmethod
-    @elapsed_time('新浪接口获取股票所有信息')
+    @elapsed_time('新浪接口获取指定股票所有信息')
     def get_alone_data_by_sina(stock_id, date, is_print=False):
         """
         【新浪财经】获取指定股票指定交易日的所有信息
@@ -82,7 +105,7 @@ class GetMicData:
             "start": date
         }
         result = requests.get(url, params=params)
-        print(result.text)
+        # print(result.text)
         result = result.text.split("\r\n")[1].split(",")
         result_json = {
             DataSet.F0_DATE: result[0],
@@ -153,7 +176,6 @@ class GetMicData:
             "invt": "2",
             "fid": "f3",
             "fs": "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23",
-            # "fields": "f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13,f14,f15,f16,f17,f18,f19,f20,f21,f22,f23,f24,f25,f26,f27,f28,f29,f30,f31,f32,f33,f34,f35,f36,f37,f38,f39,f40,f41,f42,f43,f44,f45,f46,f47,f48,f49,f50,f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65,f66,f67,f68,f69,f70,f71,f72,f73,f74,f75,f76,f77,f78,f79,f80,f81,f82,f83,f84,f85,f86,f87,f88,f89,f90,f91,f92,f93,f94,f95,f96,f97,f98,f99,f100,f101,f102,f103,f104,f105,f106,f107,f108,f109,f110,f111,f112,f113,f114,f115,f116,f117,f118,f119,f120,f121,f122,f123,f124,f125,f126,f127,f128,f129,f130,f131,f132,f133,f134,f135,f136,f137,f138,f139,f140,f141,f142,f143,f144,f145,f146,f147,f148,f149,f150,f151,f152,f153,f154,f155,f156,f157,f158,f159,f160,f161,f162,f163,f164,f165,f166,f167,f168,f169,f170,f171,f172,f173,f174,f175,f176,f177,f178,f179,f180,f181,f182,f183,f184,f185,f186,f187,f188,f189,f190,f191,f192,f193,f194,f195,f196,f197,f198,f199,f200,f201,f202,f203,f204,f205,f206,f207,f208,f209,f210,f211,f212,f213,f214,f215,f216,f217,f218,f219,f220,f221,f222,f223,f224,f225,f226,f227,f228,f229,f230,f231,f232,f233,f234,f235,f236,f237,f238,f239,f240,f241,f242,f243,f244,f245,f246,f247,f248,f249,f250,f251,f252,f253,f254,f255,f256,f257,f258,f259,f260,f261,f262,f263,f264,f265,f266,f267,f268,f269,f270,f271,f272,f273,f274,f275,f276,f277,f278,f279,f280,f281,f282,f283,f284,f285,f286,f287,f288,f289,f290,f291,f292,f293,f294,f295,f296,f297,f298,f299,f300,f301,f302,f303,f304,f305,f306,f307,f308,f309,f310,f311,f312,f313,f314,f315,f316,f317,f318,f319,f320,f321,f322,f323,f324,f325,f326,f327,f328,f329,f330,f331,f332,f333,f334,f335,f336,f337,f338,f339,f340,f341,f342,f343,f344,f345,f346,f347,f348,f349,f350,f351,f352,f353,f354,f355,f356,f357,f358,f359,f360,f361,f362,f363,f364,f365,f366,f367,f368,f369,f370,f371,f372,f373,f374,f375,f376,f377,f378,f379,f380,f381,f382,f383,f384,f385,f386,f387,f388,f389,f390,f391,f392,f393,f394,f395,f396,f397,f398,f399,f400,f401,f402,f403,f404,f405,f406,f407,f408,f409,f410,f411,f412,f413,f414,f415,f416,f417,f418,f419,f420,f421,f422,f423,f424,f425,f426,f427,f428,f429,f430,f431,f432,f433,f434,f435,f436,f437,f438,f439,f440,f441,f442,f443,f444,f445,f446,f447,f448,f449,f450,f451,f452,f453,f454,f455,f456,f457,f458,f459,f460,f461,f462,f463,f464,f465,f466,f467,f468,f469,f470,f471,f472,f473,f474,f475,f476,f477,f478,f479,f480,f481,f482,f483,f484,f485,f486,f487,f488,f489,f490,f491,f492,f493,f494,f495,f496,f497,f498,f499,f500",
             "fields": "f14,f12,f17,f15,f16,f350,f351,f3,f4,f18,f10,f8,f5,f6,f20,f21,f9,f114,f115,f7",
             "_": str(int(time.time() * 1000))
         }
@@ -175,17 +197,263 @@ class GetMicData:
             print(f'沪深A股股票数据获取不全：预期{result["total"]}条，实际{len(result["diff"])}条')
         return data_alone
 
+    @staticmethod
+    @elapsed_time('东方财富获取ETF基金所有数据')
+    def get_jj_by_df(etf_id: list = []):
+        """
+        【东方财富】获取ETF基金所有数据
+        界面： http://quote.eastmoney.com/center/gridlist.html#fund_etf
+        @param etf_id: 若给值 则返回指定基金的数据 若不给值 则返回沪所有ETF基金的数据
+        @return
+            [
+                {
+                    'f14': '基金名称',
+                    'f12': '基金代码',
+                    'f17': '开盘价',
+                    'f15': '最高价',
+                    'f16': '最低价',
+                    'f350': '涨停价',
+                    'f351': '跌停价',
+                    'f3': '涨跌幅',
+                    'f4': '涨跌额',
+                    'f18': '上一个交易日收盘价',
+                    'f10': '量比',
+                    'f8': '换手率',
+                    'f5': '成交量',
+                    'f6': '成交金额',
+                    'f7': '振幅',
+                }
+            ]
+        """
+        url = 'http://20.push2.eastmoney.com/api/qt/clist/get?'
+        params = {
+            "cb": f"jQuery112407586323830979016_{str(time.time() * 1000)}",
+            "pn": "1",
+            "pz": "100000",
+            "po": "1",
+            "np": "1",
+            "ut": "bd1d9ddb04089700cf9c27f6f7426281",
+            "fltt": "2",
+            "invt": "2",
+            "fid": "f3",
+            "fs": "b:MK0021,b:MK0022,b:MK0023,b:MK0024",
+            "fields": "f14,f12,f17,f15,f16,f350,f351,f3,f4,f18,f10,f8,f5,f6,f7",
+            "_": str(time.time() * 1000)
+        }
+        result = requests.get(url, params=params).content.decode('utf-8')
+        result = jx_jquery_result(result)
+        if len(result['data']['diff']) == result['data']['total']:
+            print(f"所有ETF基金数据获取完成：{len(result['data']['diff'])}条")
+        else:
+            print(f"所有ETF基金数据获取不全：预期{result['data']['total']}条，实际{len(result['data']['diff'])}条")
+        result_list = result['data']['diff']
+        result_new = []
+        if len(etf_id) != 0:
+            for i in etf_id:
+                for j in result_list:
+                    if j['f12'] == i:
+                        result_new.append(j)
+            return result_new
+        return result_list
+
+    @staticmethod
+    def get_image(pointer_type=EnumPointerType.MACD):
+        """
+        获取近3个月指定股票的K线即指标图
+        @param pointer_type: 指标类型
+        """
+        url = 'http://webquoteklinepic.eastmoney.com/GetPic.aspx?'
+        params = {
+            "token": "44c9d251add88e27b65ed86506f6e5da",
+            "nid": "1.510120",
+            "type": "",
+            "unitWidth": "-6",
+            "ef": "",
+            "formula": pointer_type.value,  # RSI、KDJ、MACD
+            "imageType": "KXL"
+        }
+        result = requests.get(url, params=params).content
+        with open('a.png', 'wb') as f:
+            f.write(result)
+
 
 class GetMacData:
     """
     宏观数据获取
     """
 
-    def __init__(self):
-        pass
+    @staticmethod
+    def get_plate_data(plate_type=EnumPlateType.gai_lian):
+        """
+        获取板块数据
+        @param plate_type: 概念板块plate_type=PlateType.gai_lian，地域板块plate_type=PlateType.di_yu，行业板块plate_type=PlateType.hang_ye
+        @return:
+            [
+                {
+                    'f1': '',
+                    'f2': '最新价',
+                    'f3': '涨跌幅',
+                    'f4': '涨跌额',
+                    'f5': '',
+                    'f6': '',
+                    'f7': '',
+                    'f8': '换手率',
+                    'f9': '',
+                    'f10': '',
+                    'f12': '',
+                    'f13': '',
+                    'f14': '板块名称',
+                    'f15': '',
+                    'f16': '',
+                    'f17': '',
+                    'f18': '',
+                    'f20': '总市值',
+                    'f21': '',
+                    'f23': '',
+                    'f24': '',
+                    'f25': '',
+                    'f26': '',
+                    'f22': '',
+                    'f33': '',
+                    'f11': '',
+                    'f62': '',
+                    'f128': '领涨股票',
+                    'f136': '领涨股票涨跌幅',
+                    'f115': '',
+                    'f152': '',
+                    'f124': '',
+                    'f107': '',
+                    'f104': '上涨家数',
+                    'f105': '下跌家数',
+                    'f140': '',
+                    'f141': '',
+                    'f207': '',
+                    'f208': '',
+                    'f209': '',
+                    'f222': ''
+                }
+            ]
+        """
+        hang_ye_url = 'http://81.push2.eastmoney.com/api/qt/clist/get?'
+        hang_ye_params = {
+            "cb": "jQuery112408297466168838283_1620571811003",
+            "pn": "1",
+            "pz": "10000",
+            "po": "1",
+            "np": "1",
+            "ut": "bd1d9ddb04089700cf9c27f6f7426281",
+            "fltt": "2",
+            "invt": "2",
+            "fid": "f3",
+            "fs": "m:90+t:2+f:!50",
+            "fields": "f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23,f24,f25,f26,f22,f33,f11,f62,f128,f136,f115,f152,f124,f107,f104,f105,f140,f141,f207,f208,f209,f222",
+            "_": "1620571811004"
+        }
+        gai_lian_url = 'http://30.push2.eastmoney.com/api/qt/clist/get?'
+        gai_lian_params = {
+            "cb": "jQuery11240752172781178722_1626791176577",
+            "pn": "1",
+            "pz": "10000",
+            "po": "1",
+            "np": "1",
+            "ut": "bd1d9ddb04089700cf9c27f6f7426281",
+            "fltt": "2",
+            "invt": "2",
+            "fid": "f3",
+            "fs": "m:90+t:3+f:!50",
+            "fields": "f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23,f24,f25,f26,f22,f33,f11,f62,f128,f136,f115,f152,f124,f107,f104,f105,f140,f141,f207,f208,f209,f222",
+            "_": "1626791176680"
+        }
+        di_yu_url = 'http://30.push2.eastmoney.com/api/qt/clist/get?'
+        di_yu_params = {
+            "cb": "jQuery11240752172781178722_1626791176575",
+            "pn": "1",
+            "pz": "10000",
+            "po": "1",
+            "np": "1",
+            "ut": "bd1d9ddb04089700cf9c27f6f7426281",
+            "fltt": "2",
+            "invt": "2",
+            "fid": "f3",
+            "fs": "m:90+t:1+f:!50",
+            "fields": "f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23,f24,f25,f26,f22,f33,f11,f62,f128,f136,f115,f152,f124,f107,f104,f105,f140,f141,f207,f208,f209,f222",
+            "_": "1626791176711"
+        }
+
+        if plate_type == EnumPlateType.gai_lian:
+            url = gai_lian_url
+            params = gai_lian_params
+            name = EnumPlateType.gai_lian.value
+        elif plate_type == EnumPlateType.hang_ye:
+            url = hang_ye_url
+            params = hang_ye_params
+            name = EnumPlateType.hang_ye.value
+        elif plate_type == EnumPlateType.di_yu:
+            url = di_yu_url
+            params = di_yu_params
+            name = EnumPlateType.di_yu.value
+        result = requests.get(url, params=params).content.decode('utf-8')
+        result = jx_jquery_result(result)
+        result = result['data']
+        if result["total"] == len(result["diff"]):
+            print(f'{name}数据已全部获取：{result["total"]}条')
+        else:
+            print(f'{name}数据获取不全：预期{result["total"]}条，实际{len(result["diff"])}条')
+        dddd = [
+            {
+                'f1': '',
+                'f2': '最新价',
+                'f3': '涨跌幅',
+                'f4': '涨跌额',
+                'f5': '',
+                'f6': '',
+                'f7': '',
+                'f8': '换手率',
+                'f9': '',
+                'f10': '',
+                'f12': '',
+                'f13': '',
+                'f14': '板块名称',
+                'f15': '',
+                'f16': '',
+                'f17': '',
+                'f18': '',
+                'f20': '总市值',
+                'f21': '',
+                'f23': '',
+                'f24': '',
+                'f25': '',
+                'f26': '',
+                'f22': '',
+                'f33': '',
+                'f11': '',
+                'f62': '',
+                'f128': '领涨股票',
+                'f136': '领涨股票涨跌幅',
+                'f115': '',
+                'f152': '',
+                'f124': '',
+                'f107': '',
+                'f104': '上涨家数',
+                'f105': '下跌家数',
+                'f140': '',
+                'f141': '',
+                'f207': '',
+                'f208': '',
+                'f209': '',
+                'f222': ''
+            }
+        ]
+
+        return result['diff']
 
 
 if __name__ == '__main__':
-    # result = GetMicData.get_alone_data_by_sina('sh600010', '20210716', True)  # ['301027', '600010'] 301027
-    result = GetMicData.get_alone_data_by_df(['600010'])
-    print(*result, sep='\n')
+    result = GetMicData.get_alone_data_by_sina('sh600010', '20210716', True)  # ['301027', '600010'] 301027
+    # result = GetMicData.get_alone_data_by_df(['600010'])
+    # print(*result, sep='\n')
+    # print(*GetMicData.get_jj_by_df(['512670', '515030', '159755']), sep='\n')
+    # GetMicData.get_image(pointer_type=EnumPointerType.CCI)
+    # GetMacData.get_plate_data(PlateType.gai_lian)
+    # print(*GetMacData.get_plate_data(PlateType.di_yu), sep='\n')
+    # GetMacData.get_plate_data(PlateType.hang_ye)

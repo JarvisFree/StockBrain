@@ -150,20 +150,15 @@ def get_a_all_stock():
 
 
 if __name__ == '__main__':
-    s_time = time.time()
-    dict_result = get_a_all_stock()
-    stock_id = '600010'
-    data_alone = {}
-    for i in dict_result['diff']:
-        if i['f12'] == stock_id:
-            data_alone = i
-    print(json.dumps(data_alone, ensure_ascii=False))
-    print(f'耗时：{int(time.time() - s_time)}s')
-    # f1,f2,f3,f4,f5,f6,f7,
-    # count = 500
-    # ss = ''
-    # for i in range(count):
-    #     ss += f'f{i + 1}'
-    #     if i != count - 1:
-    #         ss += ','
-    # print(ss)
+    # s_time = time.time()
+    # dict_result = get_a_all_stock()
+    # stock_id = '600010'
+    # data_alone = {}
+    # for i in dict_result['diff']:
+    #     if i['f12'] == stock_id:
+    #         data_alone = i
+    # print(json.dumps(data_alone, ensure_ascii=False))
+    # print(f'耗时：{int(time.time() - s_time)}s')
+
+    get_hang_ye()
+
