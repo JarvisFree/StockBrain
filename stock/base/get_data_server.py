@@ -15,6 +15,7 @@ from enum import Enum
 import requests
 from stock.comon.decorator import elapsed_time
 from stock.comon.jx_jquery_result import jx_jquery_result
+from stock.comon.stock_tool import get_last_day, is_trading, is_trading_by_db
 
 
 class DataSet:
@@ -276,6 +277,55 @@ class GetMicData:
         with open('a.png', 'wb') as f:
             f.write(result)
 
+    @staticmethod
+    def continue_up(stock_id, count: int, start_date: str, check_type: int):
+        """
+        获取指定股票N个交易日内持续上升的数据
+                第一种：可以通过 T+1的最高价 > T+0的开盘价来计算 或者
+                第二种：可以通过 T+1的最高价 > T+0的最低价来计算
+        @param stock_id: 'sh600010'
+        @param count: N个交易日（不含开始日期 依次往前算）
+        @param start_date: 'yyyymmdd'，开始计算的日期
+        @param check_type:
+            1:第一种情况
+            2:第二种情况
+            1008601:两种情况都满足
+            1008602:两种情况满足任意一个
+        @return: 上升：股票数据，非上升：None
+        """
+        result_list = []
+        while True:
+            if is_trading_by_db(start_date):
+                break
+            else:
+                start_date = get_last_day(start_date)
+
+        for i in range(count):
+            result_list.append(GetMicData.get_alone_data_by_sina(stock_id, start_date))
+            start_date = get_last_day(start_date)
+        # 判断是否是持续上升
+        check_data = []
+        # 第一种：后一天最高价 > 前一天开盘价
+        if all(float(result_list[i]['F5_HIGH']) > float(result_list[i + 1]['F6_LOW']) for i in range(count - 1)):
+            check_data.append(True)
+        else:
+            check_data.append(False)
+        # 第二种：后一天最高价 > 前一天最低价
+        if all(float(result_list[i]['F5_HIGH']) > float(result_list[i + 1]['F3_OPEN']) for i in range(count - 1)):
+            check_data.append(True)
+        else:
+            check_data.append(False)
+
+        if check_type == 1:
+            if not check_data[int(check_type) - 1]: return None
+        if check_type == 2:
+            if not check_data[int(check_type) - 1]: return None
+        if check_type == 1008601:  # 两种情况都满足
+            if not all(i for i in check_data): return None
+        if check_type == 1008602:  # 两种情况满足任意一个
+            if not any(i for i in check_data): return None
+        return result_list
+
 
 class GetMacData:
     """
@@ -449,7 +499,7 @@ class GetMacData:
 
 
 if __name__ == '__main__':
-    result = GetMicData.get_alone_data_by_sina('sh600010', '20210716', True)  # ['301027', '600010'] 301027
+    # result = GetMicData.get_alone_data_by_sina('sh600010', '20210716', True)  # ['301027', '600010'] 301027
     # result = GetMicData.get_alone_data_by_df(['600010'])
     # print(*result, sep='\n')
     # print(*GetMicData.get_jj_by_df(['512670', '515030', '159755']), sep='\n')
@@ -457,3 +507,5 @@ if __name__ == '__main__':
     # GetMacData.get_plate_data(PlateType.gai_lian)
     # print(*GetMacData.get_plate_data(PlateType.di_yu), sep='\n')
     # GetMacData.get_plate_data(PlateType.hang_ye)
+    result = GetMicData.continue_up('sh600010', 5, '20210725', 1008601)
+    print(*result, sep='\n')

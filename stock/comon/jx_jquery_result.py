@@ -21,7 +21,7 @@ def jx_jquery_result(str1):
     :return: 字典
     """
 
-    if str1.__find('null') != -1:
+    if str1.find('null') != -1:
         str1 = str1.replace('null', '"null"')
 
     if str1.endswith(';'):

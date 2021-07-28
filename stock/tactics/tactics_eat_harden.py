@@ -20,7 +20,7 @@ import datetime
 from stock.base.get_data_server import GetMicData
 from stock.comon.calc_tool import find_desc, find_asc
 from stock.comon.decorator import elapsed_time
-from stock.comon.stock_tool import is_trading
+from stock.comon.stock_tool import is_trading, is_trading_by_db
 
 """
             {
@@ -57,7 +57,7 @@ def get_1(day_count: int, stock_id='sh600010'):
     target_date = datetime.datetime.now().strftime('%Y%m%d')
     target_data = []
     for i in range(day_count):
-        if is_trading(target_date):
+        if is_trading_by_db(target_date):
             target_data.append(GetMicData.get_alone_data_by_sina(stock_id, target_date))
         target_date = get_old_date(i + 1)
     return target_data
