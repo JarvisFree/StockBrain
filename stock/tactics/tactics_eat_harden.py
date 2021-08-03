@@ -79,4 +79,4 @@ def get_11(day_count: int, min_limit, stock_id):
 
 
 if __name__ == '__main__':
-    print(*get_11(365 * 2, 5, 'sh600010'), sep='\n')
+    print(*get_11(100, 5, 'sh600010'), sep='\n')

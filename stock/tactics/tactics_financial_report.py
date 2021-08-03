@@ -122,7 +122,7 @@ def get_all_report(stock_id='600010'):
         n_data = []
         is_have = False
         for i in data:
-            if i["title"].__find('摘要') == -1:  # 1 删除含“摘要”的
+            if i["title"].find('摘要') == -1:  # 1 删除含“摘要”的
                 res = re.search('\D\d{4}\D', i["title"])
                 if res is not None:
                     if res.group()[1:-1] == str(now_year):
@@ -206,7 +206,7 @@ if __name__ == '__main__':
     s_time = datetime.datetime.now()
     stock_id = '600010'
     stock_id_xl = 'sh600010'
-    count = 5
+    count = 5  # 财报公布后的N日（含财报公布当日）
     result = get_all_report(stock_id)
     for k, v in result.items():
         cc_model = ['第1季度', '第2季度', '第3季度', '第4季度']

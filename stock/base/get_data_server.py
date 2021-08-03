@@ -8,6 +8,7 @@
 @Version ：1.0
 @Function：股票数据获取服务（以后以这个为准了）
 """
+import datetime
 import json
 import time
 from enum import Enum
@@ -498,14 +499,93 @@ class GetMacData:
         return result['diff']
 
 
+class MonitorData:
+    """
+    数据监测
+    """
+
+    @staticmethod
+    def monitor_price(stock_id):
+        """
+        实时监测个股当前价格
+        @param stock_id: sh600010
+        @return ['2021-07-29 11:19:29', '2.65']
+        """
+        if stock_id.startswith('sh'):
+            stock_id = '1.' + stock_id.split('sh')[1]
+        elif stock_id.startswith('sz'):
+            stock_id = '0.' + stock_id.split('sz')[1]  # TODO:是不是0.开头的 待验证
+
+        url = 'http://push2.eastmoney.com/api/qt/stock/details/get?'
+        headers = {
+            "Accept": "*/*",
+            "Accept-Encoding": "gzip, deflate",
+            "Accept-Language": "zh-CN,zh-TW;q=0.9,zh;q=0.8,en-US;q=0.7,en;q=0.6",
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "Cookie": "qgqp_b_id=a40cb88318829a05d29c3a8f50f9ec5a; cowCookie=true; intellpositionL=1186.4px; cowminicookie=true; intellpositionT=1674.5px; st_si=57885261691163; st_asi=delete; HAList=a-sh-600010-%u5305%u94A2%u80A1%u4EFD; em_hq_fls=js; st_pvi=23952558447054; st_sp=2021-07-27%2012%3A41%3A01; st_inirUrl=http%3A%2F%2Fquote.eastmoney.com%2Fcenter%2F; st_sn=6; st_psi=20210729103812783-113200301201-5894193723",
+            "Host": "push2.eastmoney.com",
+            "Pragma": "no-cache",
+            "Referer": "http://quote.eastmoney.com/",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36"
+        }
+        params = {
+            "_": int(time.time() * 1000),
+            "cb": f"jQuery112403702002849848167_{int(time.time() * 1000)}",
+            "fields1": "f1,f2,f3,f4",
+            "fields2": "f51,f52,f53,f54,f55",
+            "pos": "-11",
+            "secid": stock_id,
+            "ut": "fa5fd1943c7b386f172d6893dbfba10b"
+        }
+        result = requests.get(url, headers=headers, params=params).text
+        result = jx_jquery_result(result)
+        result = result['data']['details']
+        result = result[len(result) - 1].split(',')
+        result_price = [
+            datetime.datetime.now().strftime('%Y-%m-%d ') + result[0],
+            result[1]
+        ]
+        print(result_price)
+        return result_price
+
+
+# if __name__ == '__main__':
+#     for i in range(10):
+#         MonitorData.monitor_price('sh600010')
+#         time.sleep(5)
+
 if __name__ == '__main__':
-    # result = GetMicData.get_alone_data_by_sina('sh600010', '20210716', True)  # ['301027', '600010'] 301027
-    # result = GetMicData.get_alone_data_by_df(['600010'])
-    # print(*result, sep='\n')
-    # print(*GetMicData.get_jj_by_df(['512670', '515030', '159755']), sep='\n')
-    # GetMicData.get_image(pointer_type=EnumPointerType.CCI)
-    # GetMacData.get_plate_data(PlateType.gai_lian)
-    # print(*GetMacData.get_plate_data(PlateType.di_yu), sep='\n')
-    # GetMacData.get_plate_data(PlateType.hang_ye)
-    result = GetMicData.continue_up('sh600010', 5, '20210725', 1008601)
-    print(*result, sep='\n')
+    url = 'https://bizapi.csdn.net/mp/live-message/v1.0/message/send'
+    headers = {
+        "accept": "application/json, text/plain, */*",
+        "accept-encoding": "gzip, deflate, br",
+        "accept-language": "zh-CN,zh-TW;q=0.9,zh;q=0.8,en-US;q=0.7,en;q=0.6",
+        "authority": "bizapi.csdn.net",
+        "cache-control": "no-cache",
+        "content-length": "144",
+        "content-type": "application/json",
+        "cookie": "uuid_tt_dd=10_19720473180-1627373583585-596830; ssxmod_itna=eqAx0DyDgiDtyDBPrtD9Dmxxfxw6DuCEneh2e=D0y0FeGzDAxn40iDtP=M778G62iqef443aiqjQ0maba=9iWONQrDCPGnDBKYLpDen=D5xGoDPxDeDADYE6DAqiOD7qDdEsNv/8DbxYpnDA3Di4D+bkQDmqG0DDU7R4G2D7UnQQdPpTbBD20xKY=DjwbD/8wb=Y=5=Paq0uiNx1K=D0PQQA9x7f9KYhGVWOQDzk7DtwtgRkdoLp=ZfMNTYiPQYY+f3xmf5DhsYExhIDWq9YfNiY4rjixiQDebCr+zI5DA9a+L5iD===; ssxmod_itna2=eqAx0DyDgiDtyDBPrtD9Dmxxfxw6DuCEneh2DnKS0FYDsqKK7DL7OQiyn77xTvMRNqDrBfK2xKupCo6m=KbqqYEjjb0abGkm+2GcAQvSkQIxzr5mLyAkZ76M9LI1IjluE96xzlK0Dnb=DUxieCwdD44=DfDkeRAwPmYxr/7pD8hhot7=32owP3mGQSErDIw+Pp7fzSqfQKmrerSv0FMLqUBvnUMEEKmNnFoXpUS6UR3w/fajDojuPqLnR9lniNZXrNLu7YHyUgjPX8K7nKeaFvuKa1t=5ACbsN=Y75W4fkqggh2qgqbFCyPGqGiG=ArZiDNBmvmWWiP29cL3e2tap7KGUBw80xX4mecLfmAS4mY9LneYTe3sI3c22FmoxacI92Kw6FuAjE9Y+K+5465=9iBGPCeBl4+4W9nt3d=8/U+DLR6R2HlgDm8LFpDy5r6D3D07kDxqYE2i5v738YAw6jgAxAcqKQefhY=GqxaxcGDk7D=i=UZUkYXTODqDDLxD2QGDD===; UserName=qq_36179095; UserInfo=f917fb152cb14c6d8fc68b6d1dec8518; UserToken=f917fb152cb14c6d8fc68b6d1dec8518; UserNick=%E6%B7%A1%E6%80%80; AU=1FF; UN=qq_36179095; BT=1627522752497; p_uid=U010000; Hm_up_6bcd52f51e9b3dce32bec4a3997715ac=%7B%22islogin%22%3A%7B%22value%22%3A%221%22%2C%22scope%22%3A1%7D%2C%22isonline%22%3A%7B%22value%22%3A%221%22%2C%22scope%22%3A1%7D%2C%22isvip%22%3A%7B%22value%22%3A%220%22%2C%22scope%22%3A1%7D%2C%22uid_%22%3A%7B%22value%22%3A%22qq_36179095%22%2C%22scope%22%3A1%7D%7D; Hm_ct_6bcd52f51e9b3dce32bec4a3997715ac=6525*1*10_19720473180-1627373583585-596830!5744*1*qq_36179095; __gads=ID=09bc964720a52d60-22db345b96ca0064:T=1627642972:RT=1627642972:S=ALNI_MbvNhbZ0-K7nxGeGq_azRIiMroXPg; c_first_ref=www.baidu.com; c_first_page=https%3A//www.csdn.net/; c_segment=14; c_page_id=default; Hm_lvt_6bcd52f51e9b3dce32bec4a3997715ac=1627642947,1627642971,1627645793,1627708346; dc_sid=5496098cd0be538a7d0e5b4f6d66f031; log_Id_click=15; log_Id_view=81; c_ref=https%3A//live.csdn.net/%3Fspm%3D1000.2115.3001.4124; c_pref=https%3A//www.csdn.net/; dc_tos=qx3ftl; log_Id_pv=32; Hm_lpvt_6bcd52f51e9b3dce32bec4a3997715ac=1627708378; dc_session_id=10_1627710584016.410564",
+        "method": "POST",
+        "origin": "https://live.csdn.net",
+        "path": "/mp/live-message/v1.0/message/send",
+        "pragma": "no-cache",
+        "referer": "https://live.csdn.net/room/harmonycommunity/cnBKxjag",
+        "scheme": "https",
+        "sec-ch-ua": "\"Chromium\";v=\"92\", \" Not A;Brand\";v=\"99\", \"Google Chrome\";v=\"92\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-site",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36",
+        "x-app-id": "CSDN-LIVE-PC",
+        "x-ca-key": "203801083",
+        "x-ca-nonce": "eb287b9a-bf62-461e-88d8-827f4d2a72cb",
+        "x-ca-signature": "PWoafVZJ0cJtXdulg2OkAMcvEIXaKL2cmFpA7w6ggT8=",
+        "x-ca-signature-headers": "x-ca-key,x-ca-nonce",
+        "x-device-id": "10_19720473180-1627373583585-596830"
+    }
+
+    params = {"username": "qq_36179095", "liveId": "cnBKxjag", "message": "HarmonyOS 有奖征文大赛aaaaaaaaaaaaaaaaaaaa",
+              "anchorId": "harmonycommunity", "image": "", "platform": "pc"}
+    print(requests.post(url, params=params).text)
