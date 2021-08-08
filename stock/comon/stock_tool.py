@@ -98,7 +98,7 @@ def is_trading(date, is_print=True):
 def get_last_day(refer_day):
     """
     获取指定日期的的上一个交易日
-    @param refer_day: 指定日期
+    @param refer_day: 指定日期 yyyymmdd
     @return:
     """
     d = datetime.datetime.strptime(refer_day, '%Y%m%d')
@@ -108,6 +108,21 @@ def get_last_day(refer_day):
         return new_day
     else:
         return get_last_day(new_day)
+
+
+def get_next_day(refer_day):
+    """
+    获取指定日期的的下一个交易日
+    @param refer_day: 指定日期 yyyymmdd
+    @return:
+    """
+    d = datetime.datetime.strptime(refer_day, '%Y%m%d')
+    offset = datetime.timedelta(days=+1)
+    new_day = (d + offset).strftime('%Y%m%d')
+    if is_trading_by_db(new_day):
+        return new_day
+    else:
+        return get_next_day(new_day)
 
 
 @elapsed_time('判断日期是否是交易日')
@@ -148,6 +163,9 @@ def to_db(day_count: int):
     db.cur.close()
     db.con.close()
 
+
+# if __name__ == '__main__':
+#     print('aaa:', get_next_day('20210804'))
 
 if __name__ == '__main__':
     to_db(365 * 1)
